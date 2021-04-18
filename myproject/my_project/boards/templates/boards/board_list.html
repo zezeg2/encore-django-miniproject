@@ -1,0 +1,65 @@
+{%extends "layout.html"%}
+{% block content %}
+{% load bootstrap4 %}
+    <!-- {%for board in board_list %}
+    <a href="{%url 'boards:each_list' board.pk %}">
+        <table>
+            <tr>{{board.board_name}}</tr>
+        </table>
+    </a>
+    {%endfor%} -->
+    
+    <form action="{%url 'boards:search_board' %}">
+        <input type="text" name="board_key" value="{{request.GET.board_key}}">
+        <input type="submit" value="검색"class = "btn btn-danger"><br>
+        제목으로 검색 <input type="radio" name="select" value="board_name" checked>
+        태그로 검색 <input type="radio" name="select" value="about">
+    </form>
+    
+    <h3>
+        {% if board_key_from_view %}
+            "{{board_key_from_view}}" (으)로 검색된 게시판 목록
+        {%else%}
+            전체 게시판 목록
+        {% endif %}
+    </h3>
+
+    <table class="table table-hover"  >
+        <tr><th>게시판이름</th><th>태그</th><th>개설일</th></tr>
+        
+          {%  for board in  board_list %}
+               <tr><td><a href="{% url 'boards:each_list' board.pk%}">{{ board.board_name }}</a> </td>
+                   <td>{{  board.about  }}</td>
+                   <td>{{ board.established_date}}</td></tr>
+          {%  endfor %}
+        
+        </table>
+
+
+        <hr>
+        <div class="paginator">
+            {% if is_paginated %}
+                <ul class="pagination">
+            {% if page_obj.has_previous %}
+                 <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                 <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                 <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% else %}
+                 <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+          </ul>
+        {% endif %}
+        </div>
+        
+{% endblock%}
+

@@ -1,0 +1,94 @@
+{%extends "layout.html"%}
+{% load bootstrap4 %}
+
+{%block content%}
+    <h3>최근 인기게시판</h3>
+    <a href="{%url 'boards:board_list' %}">전체게시판 바로가기</a>
+    <table class="table table-hover"  >
+        <tr><th>게시판이름</th><th>태그</th><th>개설일</th></tr>
+        
+        {%  for board in  board_list %}
+            <tr>
+                <td><a href="{% url 'boards:each_list' board.pk%}">{{ board.board_name }}</a> </td>
+                <td>{{  board.about  }}</td>
+                <td>{{ board.established_date}}</td>
+            </tr>
+        {%  endfor %}
+        
+    </table>
+
+    <form action="{%url 'boards:search_board' %}">
+        <input type="text" name="board_key" value="{{request.GET.board_key}}">
+        <input type="submit" value="검색"class = "btn btn-danger"><br>
+        제목으로 검색 <input type="radio" name="select" value="board_name" checked>
+        태그로 검색 <input type="radio" name="select" value="about">
+    </form><hr>
+    <h3>
+    {% if current_board %}
+        {{current_board.board_name}} 의 게시글
+    {%else%} 
+        전체 게시글
+    {% endif %}
+    </h3>
+    {% if post_key_from_view %}
+         검색어 : "{{post_key_from_view}}"
+    {% endif %}
+    
+    <table class="table table-hover"  >
+    <tr><th>글번호</th><th>제목</th><th>작성자</th><th>등록일</th></tr>
+    
+      {%  for post in  post_list %}
+           <tr><td>{{ post.id }}</td>
+               <td><a href="{% url 'boards:post_detail' post.pk%}">{{ post.title }}</a> </td>
+               <td>{{  post.author  }}</td>
+               <td>{{ post.published_date  }}</td></tr>
+      {%  endfor %}
+    
+    </table>
+
+
+
+<hr>
+<div class="paginator">
+    {% if is_paginated %}
+        <ul class="pagination">
+    {% if page_obj.has_previous %}
+         <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+        <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in paginator.page_range %}
+        {% if page_obj.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+         <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+         <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+    {% else %}
+         <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+{% endif %}
+</div>
+
+
+    {% if current_board %}
+         <form action="{%url 'boards:each_list' current_board.pk %}" method="get"> 
+    {%else%}
+          <form action="{%url 'boards:post_list' %}" method="get"> 
+    {% endif %}
+            <input type="text" name="key" value="{{request.GET.key}}">
+            <input type="submit" value="검색"class = "btn btn-danger"><br>
+            제목+내용으로 검색 <input type="radio" name="select" value="content" checked>
+            작성자명으로 검색 <input type="radio" name="select" value="author">
+        </form>
+        <br><br>
+<!-- {{current_board}}
+{{board_list}} -->
+{%endblock%}
+
+
+
+

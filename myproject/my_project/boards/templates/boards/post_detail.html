@@ -1,0 +1,46 @@
+{%extends "layout.html"%}
+{%block content%}
+<h1>{{post.title}}</h1><hr>
+
+{% if post.image %}
+    <img src="{{post.image.url}}" width="auto">
+{% endif %}
+<p>{{post.content}}</p>
+
+
+<hr>
+조회수 : {{post.view_count}}<br>
+작성자 : {{post.author}}<br>
+작성일 : {{post.published_date}} (수정일 : {{post.updated_date}})
+<hr>
+{% if user == post.author %}
+<a href="{%url 'boards:post_edit' post.pk %}">수정</a>
+<a href="{%url 'boards:post_delete' post.pk%}">삭제</a>   
+{% endif %}
+<h4>Comments</h4>
+
+    <form action="{%url 'boards:comment_new' post.pk%}"method="post" >
+        {% csrf_token %}
+        
+        {{comment_form}}
+
+        <input type="submit" value="저장">
+    </form>
+<hr>
+
+{% for comment in post.comments.all %}
+  <table class="comments">
+      <!-- <tr class="one-comment"><td>작성자 : {{comment.author}}, {{comment.created_date|timesince}}전,{{comment.text|linebreaks}}</td></tr> -->
+      <tr style="height: 45px;">
+          <td>{{comment.author}} : {{comment.text}}</td> 
+          <td style="text-align: right; margin-top:10px;">
+            {{comment.created_date|timesince}}전  
+            {% if user == comment.author %}
+                <a href="{%url 'boards:comment_delete' post.pk comment.pk%}">삭제</a>        
+            {% endif %}</td>
+      </tr>
+      
+  </table>
+{% endfor %}
+<!-- {{post.belong}} -->
+{%endblock%} 
